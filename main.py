@@ -7,23 +7,35 @@ class YoutubeDownloader:
     def __init__(self, url=None):
         self.url = url
 
-    def download(self, url):
-        f = self.get_format(url)
-        a = list(map(lambda x: int(x.split()[0]), f.splitlines()[1:]))
+    def download(self, url, type_url):
+        if type_url == "video":
+            f = self.get_format(url)
+            a = list(map(lambda x: int(x.split()[0]), f.splitlines()[1:]))
 
-        print(f)
+            print(f)
 
-        while True:
-            format_id = int(input("\a\n[format_id] ~> "))
-            if format_id in a:
-                break
-            print("Mohon masukkan format_id dengan benar")
+            while True:
+                format_id = int(input("\a\n[format_id] ~> "))
+                if format_id in a:
+                    break
+                print("Mohon masukkan format_id dengan benar")
 
-        opt = {
-            "format": f"{format_id}+249/{format_id}+250/{format_id}+251",
-            "progress_hooks": [self.progress_hooks],
-            "logger": self,
-        }
+            opt = {
+                "format": f"{format_id}+249/{format_id}+250/{format_id}+251",
+                "progress_hooks": [self.progress_hooks],
+                "logger": self,
+            }
+        elif type_url == "audio":
+            opt = {
+                "format": "bestaudio/best",
+                "postprocessors": [
+                    {
+                        "key": "FFmpegExtractAudio",
+                        "preferredcodec": "mp3",
+                        "preferredquality": "128",
+                    }
+                ],
+            }
 
         with YoutubeDL(opt) as ytdl:
             ytdl.download([url])
@@ -105,7 +117,8 @@ parser.add_argument(
     "url", type=str, help="url youtube yang ingin anda download"
 )
 parser.add_argument(
-    "--type, -t",
+    "--type",
+    "-t",
     type=str,
     help="hendak dijadikan apa url youtube-nya",
     choices=["video", "audio"],
@@ -114,6 +127,6 @@ parser.add_argument(
 args = parser.parse_args()
 
 if args.url:
-    yt.download(args.url)
+    yt.download(args.url, args.type)
 else:
     yt.start()
