@@ -1,4 +1,4 @@
-from os import system
+import argparse
 
 from youtube_dl import YoutubeDL, utils
 
@@ -95,4 +95,25 @@ class YoutubeDownloader:
         pass
 
 
-YoutubeDownloader().start()
+yt = YoutubeDownloader()
+
+parser = argparse.ArgumentParser(
+    description="module untuk mendownload video/audio dari youtube.",
+    usage="python3 main.py https://youtu.be/",
+)
+parser.add_argument(
+    "url", type=str, help="url youtube yang ingin anda download"
+)
+parser.add_argument(
+    "--type, -t",
+    type=str,
+    help="hendak dijadikan apa url youtube-nya",
+    choices=["video", "audio"],
+    default="video",
+)
+args = parser.parse_args()
+
+if args.url:
+    yt.download(args.url)
+else:
+    yt.start()
